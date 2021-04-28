@@ -232,6 +232,7 @@ class Cards:
         elif val == 1 or val == 2:
             for i in range(num):
                 self.changeCard(val)
+            game.addWin(val)
         elif val == 3 or val == 4:
             self.win(val)
             game.game = False
@@ -310,6 +311,12 @@ class Game:
             print("finished this round")
             deck.update()
 
+    def addWin(self, num):
+        if num == 1:
+            self.pl1 += 1
+        elif num == 2:
+            self.pl2 += 1
+
     def next(self, num = 5):
         for i in range(int(num)):
             if self.game:
@@ -319,6 +326,7 @@ class Game:
                     deck.war(0)
                 elif num == 1 or num == 2:
                     deck.changeCard(num)
+                    self.addWin(num)
                 elif num == 3 or num == 4:
                     self.game = False
                     deck.win(num - 3)
@@ -399,15 +407,18 @@ class Window:
         self.update() # Updates sure
 
     def createCards(self):
-        self.cards.rowconfigure([0,1], minsize = 150, weight = 1)
-        self.cards.columnconfigure([0, 1], minsize = 300, weight = 1)
-        self.cards.geometry('+200+100')
-        img = PhotoImage(master = self.cards, file = 'images/green_back.png')
+        self.cards.rowconfigure([0,1], weight = 1)
+        self.cards.columnconfigure([0, 1], weight = 1)
+        self.cards.geometry('200x100+1200+100')
+        self.cards.tk_setPalette(Helpers.randomColor())
+        loc = 'images/green_back.png'
+        img = PhotoImage(master = self.cards, file = loc)
         self.cards.pl1 = tk.Label(master = self.cards, image = img)
         self.cards.pl2 = tk.Label(master = self.cards, image = img)
         self.cards.pl1.grid(column = 0, row = 1)
         self.cards.pl2.grid(column = 1, row = 1)
         self.cards.update()
+        self.updateCard()
 
     def updateAve(self):
         num = Helpers.ave()
@@ -416,6 +427,8 @@ class Window:
         self.p2WDis["text"] = num[2]
         self.update()
 
+    # Change card size based on window size
+
     def updateCard(self):
         try:
             self.img1loc = 'images/green_back.png'
@@ -423,15 +436,29 @@ class Window:
             for i in range(len(deck.cardNames)):
                 if deck.cardNames[i] == deck.p1[0][1]:
                     self.img1loc = deck.img[i]
-                    print(self.img1loc)
                 if deck.cardNames[i] == deck.p2[0][1]:
                     self.img2loc = deck.img[i]
-                    print(self.img2loc)
+            self.geo = self.cards.geometry()
+            self.geo = self.geo.split('+', 4)
+            self.geo = self.geo[0].split('x')
+            self.x = int(int(self.geo[0]) / 2)
+            self.y = int(self.geo[1])
+            print(self.x)
+            print(self.y)
+            print()
+            img = Image.open(self.img1loc)
+            img = img.resize((self.x,self.y))
+            img.save('images/img1tmp.png')
+            img = Image.open(self.img2loc)
+            img = img.resize((self.x,self.y))
+            img.save('images/img2tmp.png')
+            self.img1loc = 'images/img1tmp.png'
+            self.img2loc = 'images/img2tmp.png'
             self.img1 = PhotoImage(master = self.cards, file = self.img1loc)
             self.img2 = PhotoImage(master = self.cards, file = self.img2loc)
-            
             self.cards.pl1['image'] = self.img1
             self.cards.pl2['image'] = self.img2
+            self.cards.update()
         except:
             None
 
