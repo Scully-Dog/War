@@ -297,6 +297,7 @@ class Game:
                     deck.war(0)
                 elif num == 1 or num == 2:
                     deck.changeCard(num)
+                    self.addWin(num)
                 elif num == 3 or num == 4:
                     self.game = False
                     deck.win(num - 3)
@@ -426,8 +427,6 @@ class Window:
         self.aveDis["text"] = num[1]
         self.p2WDis["text"] = num[2]
         self.update()
-
-    # Change card size based on window size
 
     def updateCard(self):
         try:
