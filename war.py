@@ -1,4 +1,5 @@
 import time, random
+import requests, io
 import tkinter as tk
 from tkinter import PhotoImage
 from PIL import Image
@@ -68,6 +69,76 @@ class Helpers:
         data.write('')
         data.close()
         window.aveDis["text"] = "0"
+
+class Photo:
+
+    def __init__(self):
+        self.C10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10C.png?token=AM3TVYKOZ5ISHNG4CNW2R2DARIG4A'
+        self.D10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10D.png?token=AM3TVYKH4M7ATUNFL5YBVWLARIGAS'
+        self.H10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10H.png?token=AM3TVYJCJAYQVCWFUITR5KDARIGRO'
+        self.S10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10S.png?token=AM3TVYKTOU2PK4MUKLKYQHDARIGRS'
+
+        self.C2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2C.png?token=AM3TVYM66GDN2GAIW7O4MA3ARIFU4'
+        self.D2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2D.png?token=AM3TVYJ5JK3XQ4TBU4QKBO3ARIG5S'
+        self.H2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2H.png?token=AM3TVYNKYBALQGUKWSMYS53ARIG5W'
+        self.S2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2S.png?token=AM3TVYLZ3JOVX7D2XCAYL33ARIGME'
+
+        self.C3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3C.png?token=AM3TVYO2DSQMSZJCUTYHUHLARIGOY'
+        self.D3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3D.png?token=AM3TVYO4WJVCL4P4ITCQYTTARIHB6'
+        self.H3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3H.png?token=AM3TVYOXVFRUWCFIPP4IEDDARIHCA'
+        self.S3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3S.png?token=AM3TVYINYANZTIG3GM6NP63ARIHCE'
+
+        self.C4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4S.png?token=AM3TVYJSLBUSYRAFWSBU4QTARIHSQ'
+        self.D4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4D.png?token=AM3TVYJKOWNA56UX5MGB4KTARIHSM'
+        self.H4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4H.png?token=AM3TVYIRSRP3WOQALPIOZ43ARIHSU'
+        self.S4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4C.png?token=AM3TVYKXDPTL2DPQL2NBR3DARIHSK'
+
+        self.C5 = ''
+        self.D5 = ''
+        self.H5 = ''
+        self.S5 = ''
+
+        self.C6 = ''
+        self.D6 = ''
+        self.H6 = ''
+        self.S6 = ''
+        
+        self.C7 = ''
+        self.D7 = ''
+        self.H7 = ''
+        self.S7 = ''
+    
+        self.C8 = ''
+        self.D8 = ''
+        self.H8 = ''
+        self.S8 = ''
+        
+        self.C9 = ''
+        self.D9 = ''
+        self.H9 = ''
+        self.S9 = ''
+
+        self.CJ = ''
+        self.DJ = ''
+        self.HJ = ''
+        self.SJ = ''
+
+        self.CQ = ''
+        self.DQ = ''
+        self.HQ = ''
+        self.SQ = ''
+        
+        self.CK = ''
+        self.DK = ''
+        self.HK = ''
+        self.SK = ''
+
+        self.CA = ''
+        self.DA = ''
+        self.HA = ''
+        self.SA = ''
+        
+        
 
 class Data:
     
