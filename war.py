@@ -4,9 +4,7 @@ from tkinter import PhotoImage
 from PIL import Image
 
 # TO DO
-# Fix clear fast
 # Do auto 1000 test
-# Add comments
 
 class Helpers: # A bunch of helper functions
 
@@ -44,12 +42,12 @@ class Helpers: # A bunch of helper functions
         out[2] = "Total Wins\n" + str(out[2]) # Creates player 2 info string
         return out # Returns the ino
     
-    def clearScn() : # Checks that you really want to delete the past
+    def clearScn(self) : # Checks that you really want to delete the past
         global clWin # Lets clWin accessable from anywhere
         clWin = Window() # Creates a check clear window
         clWin.createSub() # Creates the window
         clWin.quest['text'] = 'Want to clear?' # Adds the question
-        clWin.opt1['command'] = lambda : Helpers.cl1() # Option 1, clear the past data
+        clWin.opt1['command'] = lambda : self.cl1() # Option 1, clear the past data
         clWin.opt2['command'] = lambda : clWin.windo.destroy() # Option 2, closes the window
 
     def cl1(): # Clear past data and destroy window
@@ -120,25 +118,27 @@ class Timer: # A timer tool, Pause function is untested
             print(f"Elapsed time: {elapTime:0.4f} seconds") # Prints elapTime to 4 decimals no rounding
             return f"{elapTime:0.4f}" # Returns elapTime to 4 decimals no rounding
 
-class Cards:
+class Cards: # All card checks, movement, and creation
     
-    def __init__(self) -> None:
+    def __init__(self): # Creates the base deck and image locations
+        # Your standard deck of 52 cards
         self.deck = [['1','2S'],['2','3S'],['3','4S'],['4','5S'],['5','6S'],['6','7S'],['7','8S'],['8','9S'],['9','10S'],['10','JS'],['11','QS'],['12','KS'],['13','AS'],['1','2C'],['2','3C'],['3','4C'],['4','5C'],['5','6C'],['6','7C'],['7','8C'],['8','9C'],['9','10C'],['10','JC'],['11','QC'],['12','KC'],['13','AC'],['1','2H'],['2','3H'],['3','4H'],['4','5H'],['5','6H'],['6','7H'],['7','8H'],['8','9H'],['9','10H'],['10','JH'],['11','QH'],['12','KH'],['13','AH'],['1','2D'],['2','3D'],['3','4D'],['4','5D'],['5','6D'],['6','7D'],['7','8D'],['8','9D'],['9','10D'],['10','JD'],['11','QD'],['12','KD'],['13','AD']]
+        # Card Names
         self.cardNames = ['2S','3S','4S','5S','6S','7S','8S','9S','10S','JS','QS','KS','AS','2C','3C','4C','5C','6C','7C','8C','9C','10C','JC','QC','KC','AC','2H','3H','4H','5H','6H','7H','8H','9H','10H','JH','QH','KH','AH','2D','3D','4D','5D','6D','7D','8D','9D','10D','JD','QD','KD','AD']
+        # Image locations for each card
         self.img = ['images/2S.png','images/3S.png','images/4S.png','images/5S.png','images/6S.png','images/7S.png','images/8S.png','images/9S.png','images/10S.png','images/JS.png','images/QS.png','images/KS.png','images/AS.png','images/2C.png','images/3C.png','images/4C.png','images/5C.png','images/6C.png','images/7C.png','images/8C.png','images/9C.png','images/10C.png','images/JC.png','images/QC.png','images/KC.png','images/AC.png','images/2H.png','images/3H.png','images/4H.png','images/5H.png','images/6H.png','images/7H.png','images/8H.png','images/9H.png','images/10H.png','images/JH.png','images/QH.png','images/KH.png','images/AH.png','images/2D.png','images/3D.png','images/4D.png','images/5D.png','images/6D.png','images/7D.png','images/8D.png','images/9D.png','images/10D.png','images/JD.png','images/QD.png','images/KD.png','images/AD.png']
-        self.p1 = []
-        self.p2 = []
-        self.warCnt = 0
 
-    def deal(self):
-        random.shuffle(self.deck)
-        lent = len(self.deck) // 2
-        self.p1 = self.deck[lent:]
-        self.p2 = self.deck[:lent]
+        self.p1 = [] # Base player 1 hand
+        self.p2 = [] # Base player 2 hand
+
+    def deal(self): # Shuffles and deals this rounds cards
+        random.shuffle(self.deck) # Shuffles the base deck
+        lent = len(self.deck) // 2 # Gets deck midpoint
+        self.p1 = self.deck[lent:] # Sets player 1's hand to the first half of the deck
+        self.p2 = self.deck[:lent] # Sets player 2's hand to the second half of the deck
     
     def checkHand(self, num=0): # Returns this rounds process
-        num = int(num) # 
-        time.sleep(0.005)
+        num = int(num) # Current war position
         try:
             if self.p1[num][0] > self.p2[num][0]: # If player 1 > player 2
                 return 1 # Returns p1
@@ -162,30 +162,31 @@ class Cards:
                 game.game = False # Stops this round
                 return 3 # Returns player 1 win
 
-    def changeCard(self, num):
+    def changeCard(self, num): # Moves cards from front to back of each hand
         try:
-            if num == 1:
+            if num == 1: # If player 1 win the round
                 self.p1.append(self.p1[0]) # Adds player 2's losing card to the end of player 1's deck
                 self.p1.append(self.p2[0]) # Adds player 1's first card to the end of player 1's deck
                 self.p1.remove(self.p1[0]) # Removes player 1's first card
                 self.p2.remove(self.p2[0]) # Removes player 2's first card
-            elif num == 2:
+            elif num == 2: # If player 2 win the round
                 self.p2.append(self.p2[0]) # Adds player 1's losing card to the end of player 2's deck
                 self.p2.append(self.p1[0]) # Adds player 2's first card to the end of player 2's deck
                 self.p2.remove(self.p2[0]) # Removes player 2's first card
                 self.p1.remove(self.p1[0]) # Removes player 1's first card
             else :
-                print('Error: Change Hand')
+                print('Error: Change Hand') # Prints an error and where it occurred
         except:
-            None # Game is over need this for reasons
+            None # Game is over and somehow this was still called
 
-class Game:
+class Game: # The gameplay it self
 
     def __init__(self): # Inits the game and the game variables
 
         self.round = 0  # The Number of rounds left
         self.game = True # Weather or not to run the next round
         self.warLast = None # Weather p1 or p2 has not enough cards in a war
+        self.warCnt = 0 # Number of chained wars
         self.cnt = 0 # Number of hands this round
         self.pl1 = 0 # Number of player 1 wins
         self.pl2 = 0 # Number of player 2 wins
@@ -218,8 +219,8 @@ class Game:
                 else :
                     print("Sorry player 2 but you ran out of cards") # Prints sorry p2
                     deck.p2 = [] # Enables win for player 1
-            elif deck.warCnt <= 5: # Double war up to 5 times
-                deck.warCnt += 1 # Adds 1 to current war count
+            elif self.warCnt <= 5: # Double war up to 5 times
+                self.warCnt += 1 # Adds 1 to current war count
                 self.war(num) # MOAR WAR
             else: # Magic beans
                 pass
@@ -231,7 +232,7 @@ class Game:
             self.win(val) # Display and logging
             self.game = False # Prevents more rounds
         self.update() # Updates GUI
-        deck.warCnt = 0 # Resets for future wars
+        self.warCnt = 0 # Resets for future wars
 
     def overWar(self, num): # For double or more wars
         if num == 1 : # If player 1 has not enough cards
@@ -331,19 +332,19 @@ class Game:
         while game.game: # Runs if game is true
             self.next(1) # Steps once
 
-class Window:
+class Window: # The GUIs
 
-    def __init__(self) -> None:
-        self.windo = tk.Tk()
-        self.cards = tk.Tk()
+    def __init__(self): # Makes the 2 main windows
+        self.windo = tk.Tk() # Main UI
+        self.cards = tk.Tk() # Card display
 
-    def createMain(self):
+    def createMain(self): # The main GUI
         ftSize = 20 # Label font size
         self.windo.tk_setPalette(Helpers.randomColor()) # Sets main background color to 'teal'
         self.windo.title("WAR") # Labels the window 'WAR'
         self.windo.rowconfigure([0,1,2,3,4], minsize = 150, weight = 1)  # Adds rows to the window and sets each to be 150 pixels tall
         self.windo.columnconfigure([0, 1, 2], minsize = 300, weight = 1) # Adds columns to the rows at a width of 300 pixels each
-        self.windo.geometry('+200+100')
+        self.windo.geometry('+200+100') # Windo position on screen
         self.p1NDis = tk.Label(master = self.windo, text = 'Player 1\n', font = ("TkDefaultFont", ftSize)) # The label for player 1
         self.p1NDis.grid(row = 0, column = 0) # The labels position on the grid
         self.lftDis = tk.Label(master = self.windo, text = '', font = ("TkDefaultFont", ftSize)) # The label for the number of rounds left
@@ -362,7 +363,7 @@ class Window:
         self.aveDis.grid(row = 2, column = 1) # The labels position on the grid
         self.p2WDis = tk.Label(master = self.windo, text = '', font = ("TkDefaultFont", ftSize)) # Total number of wins for player 2
         self.p2WDis.grid(row = 2, column = 2) # The labels position on the grid
-        ftSize = 27 # Label font size
+        ftSize = 27 # Increases font size
         self.runBut = tk.Button(master = self.windo, text = '', font = ("TkDefaultFont", ftSize)) # Button to ___ once
         self.runBut.grid(row = 3, column = 0, sticky = "nsew") # Position of the button on the grid
         self.clrBut = tk.Button(master = self.windo, text = "Clear Past", command = Helpers.clearScn, font = ("TkDefaultFont", ftSize)) # Button to clear all past data
@@ -377,10 +378,10 @@ class Window:
         self.rXBut.grid(row = 4, column = 2, sticky = "nsew") # Position of the button on the grid
         self.rXEnt = tk.Entry(master = self.windo, font = ("TkDefaultFont", ftSize), justify = 'center', width = 0) # User input for ____ing X times
         self.rXEnt.grid(row = 4, column = 2) # Position of the text box
-        self.update() # Updates gui
+        self.update() # Updates GUI
 
-    def createSub(self):
-        ftSize = 20
+    def createSub(self): # A secondary selector window
+        ftSize = 20 # Font size
         self.windo.tk_setPalette(Helpers.randomColor()) # Sets main background color to 'teal'
         self.windo.title("Are You Sure") # Labels the window 'Are You Sure'
         self.windo.resizable(width = False, height = False) # Disables resizing of window
@@ -395,113 +396,114 @@ class Window:
         self.opt2.grid(row = 1, column = 1, sticky = 'nsew') # Positions option No
         self.update() # Updates sure
 
-    def createCards(self):
-        self.cards.rowconfigure([0,1], weight = 1)
-        self.cards.columnconfigure([0, 1], weight = 1)
-        self.cards.geometry('200x100+1200+100')
-        self.cards.tk_setPalette(Helpers.randomColor())
-        loc = 'images/green_back.png'
-        img = PhotoImage(master = self.cards, file = loc)
-        self.cards.pl1 = tk.Label(master = self.cards, image = img)
-        self.cards.pl2 = tk.Label(master = self.cards, image = img)
-        self.cards.pl1.grid(column = 0, row = 1)
-        self.cards.pl2.grid(column = 1, row = 1)
-        self.cards.update()
-        self.updateCard()
+    def createCards(self): # The cards display
+        self.cards.rowconfigure([0,1], weight = 1) # Number of rows
+        self.cards.columnconfigure([0, 1], weight = 1) # Number of columns
+        self.cards.geometry('200x100+1200+100') # Size and location of card window
+        self.cards.tk_setPalette(Helpers.randomColor()) # Randomizes the background color of the new window
+        loc = 'images/green_back.png' # Default card displayed
+        img = PhotoImage(master = self.cards, file = loc) # Makes the image viewable for tkniter
+        self.cards.pl1 = tk.Label(master = self.cards, image = img) # Sets left image to given image
+        self.cards.pl2 = tk.Label(master = self.cards, image = img) # Sets right image to given image
+        self.cards.pl1.grid(column = 0, row = 1) # Positions the left image
+        self.cards.pl2.grid(column = 1, row = 1) # Positions the right image
+        self.cards.update() # Updates the card display
+        self.updateCard() # Updates card display to show current cards
 
     def updateAve(self): # Updates the averages GUI section
-        num = Helpers.ave()
-        self.p1WDis["text"] = num[0]
-        self.aveDis["text"] = num[1]
-        self.p2WDis["text"] = num[2]
-        self.update()
+        num = Helpers.ave() # Gets the averages
+        self.p1WDis["text"] = num[0] # Sets the player 1 averages
+        self.aveDis["text"] = num[1] # Sets the total averages
+        self.p2WDis["text"] = num[2] # Sets the player 2 averages
+        self.update() # Updates the display
 
-    def updateCard(self): # Updates card visual more comments
+    def updateCard(self): # Updates card visual
         try:
-            self.img1loc = 'images/green_back.png'
-            self.img2loc = 'images/blue_back.png'
-            for i in range(len(deck.cardNames)):
-                if deck.cardNames[i] == deck.p1[0][1]:
-                    self.img1loc = deck.img[i]
-                if deck.cardNames[i] == deck.p2[0][1]:
-                    self.img2loc = deck.img[i]
-            self.geo = self.cards.geometry()
-            self.geo = self.geo.split('+', 4)
-            self.geo = self.geo[0].split('x')
-            self.x = int(int(self.geo[0]) / 2)
-            self.y = int(self.geo[1])
-            img = Image.open(self.img1loc)
-            img = img.resize((self.x,self.y))
-            img.save('images/img1tmp.png')
-            img = Image.open(self.img2loc)
-            img = img.resize((self.x,self.y))
-            img.save('images/img2tmp.png')
-            self.img1loc = 'images/img1tmp.png'
-            self.img2loc = 'images/img2tmp.png'
-            self.img1 = PhotoImage(master = self.cards, file = self.img1loc)
-            self.img2 = PhotoImage(master = self.cards, file = self.img2loc)
-            self.cards.pl1['image'] = self.img1
-            self.cards.pl2['image'] = self.img2
-            self.cards.update()
+            self.img1loc = 'images/green_back.png' # Sets default left image
+            self.img2loc = 'images/blue_back.png' # Sets default right image
+            for i in range(len(deck.cardNames)): # Used to determine the image corresponding with the current cards
+                if deck.cardNames[i] == deck.p1[0][1]: # Checks player 1
+                    self.img1loc = deck.img[i] # Sets player 1
+                if deck.cardNames[i] == deck.p2[0][1]: # Checks player 2
+                    self.img2loc = deck.img[i] # Sets player 2
+            self.geo = self.cards.geometry() # Gets card display dimension
+            self.geo = self.geo.split('+', 4) # Splits numbers at the + symbol
+            self.geo = self.geo[0].split('x') # Splits at the x
+            self.x = int(int(self.geo[0]) / 2) # Gets half of the width
+            self.y = int(self.geo[1]) # Gets the height
+            img = Image.open(self.img1loc) # Opens left image
+            img = img.resize((self.x,self.y)) # Resizes image to new height and width
+            img.save('images/img1tmp.png') # Saves image to the left img location
+            img = Image.open(self.img2loc) # Opens right image
+            img = img.resize((self.x,self.y)) # Resizes right image to new height and width
+            img.save('images/img2tmp.png') # Saves left image to the right img location
+            self.img1loc = 'images/img1tmp.png' # Sets the left image location to the temp location
+            self.img2loc = 'images/img2tmp.png' # Sets the right image location to the temp location
+            self.img1 = PhotoImage(master = self.cards, file = self.img1loc) # Makes the image viewable for tkniter
+            self.img2 = PhotoImage(master = self.cards, file = self.img2loc) # Makes the image viewable for tkniter
+            self.cards.pl1['image'] = self.img1 # Sets left image to img1
+            self.cards.pl2['image'] = self.img2 # Sets right image to img2
+            self.update() # Updates GUI windows
         except:
             None
 
-    def update(self):
-        self.windo.update()
+    def update(self): # Used as a shortcut
+        self.windo.update() # Updates the windo window
+        self.cards.update() # Updates the cards window
 
-def automatic():
-    global window, game, deck
-    mode.destroy()
-    window = Window()
-    game = Game()
-    deck = Cards()
-    window.createMain()
-    window.updateAve()
-    window.createCards()
-    window.runBut['text'] = 'Run 1x'
-    window.rn5But['text'] = 'Run 5x'
-    window.r10But['text'] = 'Run 10x'
-    window.rXBut['text'] = 'Run\n\nTimes'
-    window.runBut['command'] = lambda : game.setRnd(1)
-    window.rn5But['command'] = lambda : game.setRnd(5)
-    window.r10But['command'] = lambda : game.setRnd(10)
-    window.rXBut['command'] = lambda : game.setRnd(int(window.rXEnt.get()))
-    window.update()
-    window.windo.mainloop()
+def automatic(): # Auto Mode
+    global window, game, deck # The main game items
+    mode.destroy() # Gets rid of the game select screen
+    window = Window() # Creates the main GUI
+    game = Game() # Starts the gameplay
+    deck = Cards() # Creates a deck a cards
+    window.createMain() # Creates the main window
+    window.updateAve() # Updates the ave info
+    window.createCards() # Creates the card window
+    window.runBut['text'] = 'Run 1x' # Sets upper left button
+    window.rn5But['text'] = 'Run 5x' # Sets lower left button
+    window.r10But['text'] = 'Run 10x' # Sets lower center button
+    window.rXBut['text'] = 'Run\n\nTimes' # Sets lower right button
+    window.runBut['command'] = lambda : game.setRnd(1) # Gives the button its command
+    window.rn5But['command'] = lambda : game.setRnd(5) # Gives the button its command
+    window.r10But['command'] = lambda : game.setRnd(10) # Gives the button its command
+    window.rXBut['command'] = lambda : game.setRnd(int(window.rXEnt.get())) # Gives the button its command
+    window.update() # Updates the windows
+    window.windo.mainloop() # Runs forever while still excepting and following the button commands
             
-def manual():
-    global window, game, deck
-    mode.destroy()
-    window = Window()
-    game = Game()
-    deck = Cards()
-    window.createMain()
-    window.updateAve()
-    window.createCards()
-    window.runBut['text'] = 'Step 1x'
-    window.rn5But['text'] = 'Step 5x'
-    window.r10But['text'] = 'Step\n\nTimes'
-    window.rXBut['text'] = 'Finish'
-    window.rXEnt.grid(column = 1)
-    window.runBut['command'] = lambda : game.next(1)
-    window.rn5But['command'] = lambda : game.next(5)
-    window.r10But['command'] = lambda : game.xCmd
-    window.rXBut['command'] = game.finish
-    deck.deal()
-    window.update()
-    window.windo.mainloop()
+def manual(): # Manual Mode, step by step
+    global window, game, deck # The main game items
+    mode.destroy() # Gets rid of the game select screen
+    window = Window() # Creates the main GUI
+    game = Game() # Starts the gameplay
+    deck = Cards() # Creates a deck a cards
+    window.createMain() # Creates the main window
+    window.updateAve() # Updates the ave info
+    window.createCards() # Creates the card window
+    window.runBut['text'] = 'Step 1x' # Sets upper left button
+    window.rn5But['text'] = 'Step 5x' # Sets lower left button
+    window.r10But['text'] = 'Step\n\nTimes' # Sets lower center button
+    window.rXBut['text'] = 'Finish' # Sets lower right button
+    window.rXEnt.grid(column = 1) # Changes the position of the entry box from default
+    window.runBut['command'] = lambda : game.next(1) # Gives the button its command
+    window.rn5But['command'] = lambda : game.next(5) # Gives the button its command
+    window.r10But['command'] = lambda : game.xCmd # Gives the button its command
+    window.rXBut['command'] = game.finish # Gives the button its command
+    deck.deal() # Deals the cards
+    window.update() # Updates the windows
+    window.windo.mainloop() # Runs forever while still excepting and following the button commands
 
-global mode
-mode = tk.Tk()
-mode.title('Game Mode')
-mode.tk_setPalette(Helpers.randomColor())
-mode.rowconfigure([0,1], minsize = 75, weight = 1)
-mode.columnconfigure([0,1], minsize = 150, weight = 1)
-modeDis = tk.Label(master = mode, text = 'Which version?', font = ('TkDefaultFont', 20))
-modeDis.grid(row = 0, column = 0, columnspan = 2, sticky = 'nsew')
-mode1But = tk.Button(master = mode, text = 'Auto', command = automatic, font = ('TkDefaultFont', 20))
-mode1But.grid(row = 1, column = 0, sticky = "nsew")
-mode2But = tk.Button(master = mode, text = "Step", command = manual, font = ('TkDefaultFont', 20))
-mode2But.grid(row = 1, column = 1, sticky = 'nsew')
-mode.update()
-mode.mainloop()
+global mode # So i can destroy it later
+mode = tk.Tk() # Makes the mode selection window
+mode.title('Game Mode') # Sets the window name 
+mode.tk_setPalette(Helpers.randomColor()) # Sets main background color to a random HEX color
+mode.rowconfigure([0,1], minsize = 75, weight = 1) # Adds rows at a min height of 75
+mode.columnconfigure([0,1], minsize = 150, weight = 1) # Adds columns at a min width of 150
+modeDis = tk.Label(master = mode, text = 'Which version?', font = ('TkDefaultFont', 20)) # Label asking which version
+modeDis.grid(row = 0, column = 0, columnspan = 2, sticky = 'nsew') # Label location
+mode1But = tk.Button(master = mode, text = 'Auto', command = automatic, font = ('TkDefaultFont', 20)) # Automatic mode
+mode1But.grid(row = 1, column = 0, sticky = "nsew") # Auto button position
+mode2But = tk.Button(master = mode, text = "Step", command = manual, font = ('TkDefaultFont', 20)) # Manual mode
+mode2But.grid(row = 1, column = 1, sticky = 'nsew') # Manual button position
+mode.update() # Updates the mode window
+mode.mainloop() # Runs forever
