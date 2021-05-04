@@ -1,200 +1,124 @@
 import time, random
-import requests, io
 import tkinter as tk
 from tkinter import PhotoImage
 from PIL import Image
 
-# COMPLETELY remake war here for one file and multimode option
-#
 # TO DO
 # Fix clear fast
 # Do auto 1000 test
-# Move war and overWar into game from card
+# Add comments
 
-class Helpers:
+class Helpers: # A bunch of helper functions
 
-    def randomColor() :
-        color = '#'
-        for i in range(6) :
-            color += random.choice("1234567890ABCDEF")
-        print(color)
-        return color
+    def randomColor() : # Returns random HEX color
+        color = '#' # Starts the hex string
+        for i in range(6) : # Repeats 6 times
+            color += random.choice("1234567890ABCDEF") # Adds a random hex digit to the hex string
+        print(color) # Prints color
+        return color # Returns the HEX color
     
     def ave() : # Gets the average scores
-        out = [0,0,0]
-        lis1 = []
-        lis2 = []
-        data = open("stats.txt", 'r')
-        stats = list(data)
-        data.close()
-        try :
-            for i in stats :
-                lis1.append(i[:1])
-                lis2.append(i[2:-1])
-            for i in lis1 :
-                if int(i) == 1 :
-                    out[0] += 1
-                elif int(i) == 2 :
-                    out[2] += 1
-            for i in lis2 :
-                out[1] += int(i)
-            out[1] = float(out[1] / len(lis2))
-            out[1] = float(format(out[1], ".3f"))
+        out = [0,0,0] # List of pl1 wins, average length, pl2 wins
+        lis1 = [] # List of player wins
+        lis2 = [] # List of round lengths
+        data = open("stats.txt", 'r') # Opens past data in read mode
+        stats = list(data) # Copies the data into a list
+        data.close() # Closes past data file
+        try : # For when there is no data
+            for i in stats : # Repeats for each data entry
+                lis1.append(i[:1]) # Adds the winner at i
+                lis2.append(i[2:-1]) # Add round length at i
+            for i in lis1 : # Repeats for the total number of data entries
+                if int(i) == 1 : # If the entry is player 1
+                    out[0] += 1 # Adds to the player 1 total win count
+                elif int(i) == 2 : # If player 2
+                    out[2] += 1 # Adds to the player 2 total win count
+            for i in lis2 : # Repeats for each entry in round length
+                out[1] += int(i) # Adds entry length to total round length
+            out[1] = float(out[1] / len(lis2)) # Averages the round lengths
+            out[1] = float(format(out[1], ".3f")) # Makes the average have only 3 decimals no rounding
         except :
             pass
-        out[0] = "Total Wins\n" + str(out[0])
-        out[1] = "Average\n" + str(out[1])
-        out[2] = "Total Wins\n" + str(out[2])
-        return out
-        # PL1 wins, ave Dub, PL2 wins
+        out[0] = "Total Wins\n" + str(out[0]) # Creates player 1 info string
+        out[1] = "Average\n" + str(out[1]) # Creates average length info string
+        out[2] = "Total Wins\n" + str(out[2]) # Creates player 2 info string
+        return out # Returns the ino
     
     def clearScn() : # Checks that you really want to delete the past
-        global clWin
-        clWin = Window()
-        clWin.createSub()
-        clWin.quest['text'] = 'Want to clear?'
-        clWin.opt1['command'] = lambda : Helpers.cl1()
-        clWin.opt2['command'] = lambda : clWin.windo.destroy()
+        global clWin # Lets clWin accessable from anywhere
+        clWin = Window() # Creates a check clear window
+        clWin.createSub() # Creates the window
+        clWin.quest['text'] = 'Want to clear?' # Adds the question
+        clWin.opt1['command'] = lambda : Helpers.cl1() # Option 1, clear the past data
+        clWin.opt2['command'] = lambda : clWin.windo.destroy() # Option 2, closes the window
 
-    def cl1():
-        Helpers.clearScn()
-        clWin.windo.destroy()
+    def cl1(): # Clear past data and destroy window
+        data = Data()
+        data.clear()
+        clWin.windo.destroy() # Destroys window
 
-    def clrScreen() : # Clears the past data while adding it to a master data file
-        data = open("stats.txt", 'r+')
-        master = open("masterStats.txt", 'a')
-        master.write(data.read())
-        master.close()
-        data.truncate(0)
-        data.write('')
-        data.close()
-        window.aveDis["text"] = "0"
-
-class Photo:
-
-    def __init__(self):
-        self.C10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10C.png?token=AM3TVYKOZ5ISHNG4CNW2R2DARIG4A'
-        self.D10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10D.png?token=AM3TVYKH4M7ATUNFL5YBVWLARIGAS'
-        self.H10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10H.png?token=AM3TVYJCJAYQVCWFUITR5KDARIGRO'
-        self.S10 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/10S.png?token=AM3TVYKTOU2PK4MUKLKYQHDARIGRS'
-
-        self.C2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2C.png?token=AM3TVYM66GDN2GAIW7O4MA3ARIFU4'
-        self.D2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2D.png?token=AM3TVYJ5JK3XQ4TBU4QKBO3ARIG5S'
-        self.H2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2H.png?token=AM3TVYNKYBALQGUKWSMYS53ARIG5W'
-        self.S2 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/2S.png?token=AM3TVYLZ3JOVX7D2XCAYL33ARIGME'
-
-        self.C3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3C.png?token=AM3TVYO2DSQMSZJCUTYHUHLARIGOY'
-        self.D3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3D.png?token=AM3TVYO4WJVCL4P4ITCQYTTARIHB6'
-        self.H3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3H.png?token=AM3TVYOXVFRUWCFIPP4IEDDARIHCA'
-        self.S3 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/3S.png?token=AM3TVYINYANZTIG3GM6NP63ARIHCE'
-
-        self.C4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4S.png?token=AM3TVYJSLBUSYRAFWSBU4QTARIHSQ'
-        self.D4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4D.png?token=AM3TVYJKOWNA56UX5MGB4KTARIHSM'
-        self.H4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4H.png?token=AM3TVYIRSRP3WOQALPIOZ43ARIHSU'
-        self.S4 = 'https://raw.githubusercontent.com/Scully-Dog/War/main/images/4C.png?token=AM3TVYKXDPTL2DPQL2NBR3DARIHSK'
-
-        self.C5 = ''
-        self.D5 = ''
-        self.H5 = ''
-        self.S5 = ''
-
-        self.C6 = ''
-        self.D6 = ''
-        self.H6 = ''
-        self.S6 = ''
-        
-        self.C7 = ''
-        self.D7 = ''
-        self.H7 = ''
-        self.S7 = ''
+class Data: # All the past info handles
     
-        self.C8 = ''
-        self.D8 = ''
-        self.H8 = ''
-        self.S8 = ''
-        
-        self.C9 = ''
-        self.D9 = ''
-        self.H9 = ''
-        self.S9 = ''
-
-        self.CJ = ''
-        self.DJ = ''
-        self.HJ = ''
-        self.SJ = ''
-
-        self.CQ = ''
-        self.DQ = ''
-        self.HQ = ''
-        self.SQ = ''
-        
-        self.CK = ''
-        self.DK = ''
-        self.HK = ''
-        self.SK = ''
-
-        self.CA = ''
-        self.DA = ''
-        self.HA = ''
-        self.SA = ''
-        
-        
-
-class Data:
-    
-    def __init__(self):
-        self.dataa = open('stats.txt', 'a')
-        self.datar = open('stats.txt', 'r')
+    def __init__(self): # Opens past data files
+        self.data = open('stats.txt', 'r+')
         self.master = open('masterStats.txt', 'a')
 
-    def __delattr__(self):
-        self.dataa.close()
-        self.datar.close()
-        self.master.close()
+    def __delattr__(self): # The close function
+        self.data.close() # Closes the data file
+        self.master.close() # Closes the master data file
 
     def addData(self, num):
-        txt = str(num) + " " + str(game.cnt) + "\n" # Formats this rounds data
-        self.dataa.write(txt) # Adds this rounds data to stats.txt
+        if game.cnt != 0:
+            txt = str(num) + " " + str(game.cnt) + "\n" # Formats this rounds data
+            self.data.write(txt) # Adds this rounds data to stats.txt
 
-class TimerError(Exception): # Needed for Timer class
-    """A custom exception used to report errors in use of Timer class"""
+    def clear(self):
+        self.master.write(self.data.read()) # Adds all of current data to master data
+        self.data.truncate(0) # Clears all lines up to the first
+        self.data.write('') # Writes blank space to the first line in data
+        window.aveDis["text"] = "0" # Changes average displayed to 0
+        self.close()
 
-class Timer: # A simple timer tool
-    def __init__(self):
-        self.startTime = None
-        self.pauseTime = 0
+    def close(self): # Closes all open data files
+        self.__delattr__() # Runs close function
 
-    def start(self):
-        """Start a new timer"""
-        if self.startTime is not None:
-            raise TimerError(f"Timer is already running. Use .stop() to stop it")
+class Timer: # A timer tool, Pause function is untested
 
-        self.startTime = time.perf_counter()
+    def __init__(self): # Creates the timer
+        self.startTime = None # Creates a start time variable
+        self.pauseTime = 0 # Creates a pause length variable
 
-    def getTime(self) :
-        if self.startTime is None:
-            raise TimerError(f"Timer is not running. Use .start() to start it")
-        print(self.startTime)
-        elapTime = time.perf_counter() - self.startTime
-        if elapTime <= 0.0005 : # Rounds cause y not
-            return 0
-        return elapTime
+    def start(self): # Starts a new timer
 
-    def pause(self):
-        self.pauseTime = time.perf_counter() + self.pauseTime
+        if self.startTime is not None: # Checks if timer is already running
+            print("Timer is already running. Use .stop() to stop it") # Prints error
+        else:
+            self.startTime = time.perf_counter() # Records the time when it is called
 
-    def play(self):
-        self.pauseTime = time.perf_counter() - self.startTime - self.pauseTime
+    def getTime(self) : # Returns timer length
+        if self.startTime is None: # Checks to see if a timer was started
+            print("Timer is not running. Use .start() to start it") # Prints error
+        else: # If timer is running
+            elapTime = time.perf_counter() - self.startTime # Takes current time minus start time
+            if elapTime <= 0.0005 : # Rounds cause y not
+                return 0 # Returns pretty number
+            return elapTime # Returns the time elapsed
 
-    def stop(self):
-        """Stop the timer, and report the elapsed time"""
-        if self.startTime is None:
-            raise TimerError(f"Timer is not running. Use .start() to start it")
+    def pause(self): # Sets the pause time to now plus previous paused time length
+        self.pauseTime = time.perf_counter() + self.pauseTime # Should set pauseTime to now + past pause length
 
-        elapTime = time.perf_counter() - self.startTime - self.pauseTime
-        self.startTime = None
-        print(f"Elapsed time: {elapTime:0.4f} seconds")
-        return f"{elapTime:0.4f}"
+    def play(self): # Adds (pause time - time now) to startTime
+        self.pauseTime = time.perf_counter() - self.startTime + self.pauseTime
+
+    def stop(self): # Stops timer and returns elapTime
+
+        if self.startTime is None: # If the timer hasn't stated yet
+            print("Timer is not running. Use .start() to start it") # Prints error
+        else:
+            elapTime = time.perf_counter() - self.startTime - self.pauseTime # Calculates the elapTime
+            self.startTime = None # Stops the timer
+            print(f"Elapsed time: {elapTime:0.4f} seconds") # Prints elapTime to 4 decimals no rounding
+            return f"{elapTime:0.4f}" # Returns elapTime to 4 decimals no rounding
 
 class Cards:
     
@@ -212,39 +136,31 @@ class Cards:
         self.p1 = self.deck[lent:]
         self.p2 = self.deck[:lent]
     
-    def checkHand(self, num=0):
-        num = int(num)
+    def checkHand(self, num=0): # Returns this rounds process
+        num = int(num) # 
         time.sleep(0.005)
         try:
-            if self.p1[num][0] > self.p2[num][0]:
-                return 1
-            elif self.p1[num][0] < self.p2[num][0]:
-                return 2
-            elif self.p1[num][0] == self.p2[num][0]:
-                return 0
-        except:
-            try:
+            if self.p1[num][0] > self.p2[num][0]: # If player 1 > player 2
+                return 1 # Returns p1
+            elif self.p1[num][0] < self.p2[num][0]: # If player 2 > player 1
+                return 2 # Returns p2
+            elif self.p1[num][0] == self.p2[num][0]: # If player 1 = player 2
+                return 0 # Returns war
+        except: # Means player 1 or 2 has no cards
+            try: # Checks if player 1 ran out of cards
                 if self.p1 == []:
-                    self.win(2)
-                    game.cnt = 0
-                    game.game = False
-                    return 5
-            except:
-                self.win(2)
-                game.cnt = 0
-                game.game = False
-                return 5
-            try:
+                    None
+            except: # Player 2 wins
+                game.cnt = 0 # Resets round length
+                game.game = False # Stops this round
+                return 4 # Returns player 2 win
+            try: # Checks if player 2 ran out of cards
                 if self.p2 == []:
-                    self.win(1)
-                    game.cnt = 0
-                    game.game = False
-                    return 4
-            except:
-                self.win(1)
-                game.cnt = 0
-                game.game = False
-                return 4
+                    None
+            except: # Player 1 wins
+                game.cnt = 0 # Resets round length
+                game.game = False # Stops this round
+                return 3 # Returns player 1 win
 
     def changeCard(self, num):
         try:
@@ -263,156 +179,157 @@ class Cards:
         except:
             None # Game is over need this for reasons
 
-    def war(self, num) :
-        num += 4
-        print('war')
-        print(num)
+class Game:
+
+    def __init__(self): # Inits the game and the game variables
+
+        self.round = 0  # The Number of rounds left
+        self.game = True # Weather or not to run the next round
+        self.warLast = None # Weather p1 or p2 has not enough cards in a war
+        self.cnt = 0 # Number of hands this round
+        self.pl1 = 0 # Number of player 1 wins
+        self.pl2 = 0 # Number of player 2 wins
+
+    def setRnd(self, num): # Starts the auto runs for num rounds
+
+        self.round = num # Total rounds
+        self.run() # Starts auto code
+
+    def war(self, num) : # Runs when p1 and p2 have the same card, num is the last war pos, used for multiple wars
+        num += 4 # The number of cards to move after the first card
         try :
-            if self.p1[num] == 'Sup' : # Checks if there is a card at position num for player 1
+            if deck.p1[num] == 'Sup' : # Checks if there is a card at position num for player 1
                 pass
         except : # Ran if player 1 ran out of cards
             num = self.overWar(1) # Gets the last card position for player 1
-            game.war = True
+            game.warLast = True # Makes warLast to player 1
         try :
-            if self.p2[num] == 'Sup' : # Checks if there is a card at position num for player 2
+            if deck.p2[num] == 'Sup' : # Checks if there is a card at position num for player 2
                 pass
         except : # Ran if player 2 ran out of cards
             num = self.overWar(2) # Gets the last card position for player 2
-            game.war = False
-        val = self.checkHand(num)
-        print(val)
-        print(str(self.warCnt) + 'fart')
-        if val == 0:
-            if game.war != None:
-                if game.war : # Decides winner via trig
+            game.warLast = False # Makes warlast to player 2
+        val = deck.checkHand(num) 
+        if val == 0: # Double war time
+            if self.warLast != None: # If the last card is a war the win is given to the player who has more cards
+                if self.warLast : # Decides winner via trig
                     print("Sorry player 1 but you ran out of cards") # Prints sorry p1
-                    print(self.p1)
-                    print(self.p2)
-                    self.p1 = [] # Enables win for player 2
+                    deck.p1 = [] # Enables win for player 2
                 else :
                     print("Sorry player 2 but you ran out of cards") # Prints sorry p2
-                    print(self.p1)
-                    print(self.p2)
-                    self.p2 = [] # Enables win for player 1
-            elif self.warCnt < 5:
-                self.warCnt += 1
-                self.war(num)
-                self.warCnt = 0
-            else:
+                    deck.p2 = [] # Enables win for player 1
+            elif deck.warCnt <= 5: # Double war up to 5 times
+                deck.warCnt += 1 # Adds 1 to current war count
+                self.war(num) # MOAR WAR
+            else: # Magic beans
                 pass
-        elif val == 1 or val == 2:
-            for i in range(num):
-                self.changeCard(val)
-            game.addWin(val)
-        elif val == 3 or val == 4:
-            self.win(val)
-            game.game = False
-        self.update()
-        self.warCnt = 0
+        elif val == 1 or val == 2: # Determines if p1 or p2 wins this war
+            for i in range(num): # Gives all cards to winner
+                deck.changeCard(val)
+            game.addWin(val) # Adds to winners win count
+        elif val == 3 or val == 4: # Checks if game is over
+            self.win(val) # Display and logging
+            self.game = False # Prevents more rounds
+        self.update() # Updates GUI
+        deck.warCnt = 0 # Resets for future wars
 
-    def overWar(self, num):
+    def overWar(self, num): # For double or more wars
         if num == 1 : # If player 1 has not enough cards
-            num = len(self.p1) - 1 # Sets num to the position of the last card
+            num = len(deck.p1) - 1 # Sets num to the position of the last card
             return num # Returns num
         elif num == 2 : # If player 2 has not enough cards
-            num = len(self.p2) - 1 # Sets num to the position of the last card
+            num = len(deck.p2) - 1 # Sets num to the position of the last card
             return num # Returns num
 
-    def win(self, num):
-        print('congrats player ', str(num))
-        data = Data()
-        data.addData(num)
+    def run(self): # Automatic code
+        while self.round > 0: # While there are still more rounds left
+            self.reset() # Resets variables
+            deck.deal() # Shuffles and deals cards to p1 and p2
+            while self.game: # While game
+                num = deck.checkHand() # Returns round process
+                if num == 0: # If war
+                    self.war(0) # Runs war with a starting index of 0
+                elif num == 1 or num == 2: # If player 1 or 2 won this round
+                    deck.changeCard(num) # Adds losers card to winner's cards
+                    self.addWin(num) # Adds win to winner win count
+                elif num == 3 or num == 4: # If player 1 or 2 won the game
+                    self.win(num - 3) # Prints and logs the winner
+                elif num == None: # Just some catch code
+                    self.game = False # Ends this round
+                self.update() # Updates GUI
+                self.cnt += 1 # Adds 1 to current round count
+                if self.cnt % 10 == 0: # Runs once every 10 rounds
+                    window.updateCard() # Updates displayed cards
+            self.round = self.round - 1 # Lowers total round cnt by 1
+            self.update() # Updates GUI
 
-    def update(self):
-        window.updateAve()
-        if window.endBut["state"] == "active" :
-            exit()
-        try:
-            window.rndDis['text'] = "Current Round: " + str(game.cnt)
-            window.p1Dis['text'] = "Card: " + self.p1[0][1] + "\nCards Left: " + str(len(self.p1)) + '\nRound Wins: ' + str(game.pl1)
-            window.lftDis['text'] = 'Rounds Left: ' + str(game.round)
-            window.p2Dis["text"] = "Card: " + self.p2[0][1] + "\nCards Left: " + str(len(self.p2)) + '\nRound Wins: ' + str(game.pl2)
+    def addWin(self, num): # Adds win to winner
+        if num == 1: # If player 1
+            self.pl1 += 1 # Add 1 to player 1 win cnt
+        elif num == 2: # If player 2
+            self.pl2 += 1 # Add 1 to player 2 win cnt
+
+    def next(self, num = 5): # Manual stepping code
+        for i in range(int(num)): # Runs num times
+            if self.game: # If the game is not over
+                print(game.cnt) # Prints the current round cnt
+                num = deck.checkHand() # Returns current round process
+                if num == 0: # If war
+                    self.war(0) # Runs war with a starting index of 0
+                elif num == 1 or num == 2: # If player 1 or 2 won this round
+                    deck.changeCard(num) # Adds losers card to winner's cards
+                    self.addWin(num) # Adds win to winner win count
+                elif num == 3 or num == 4: # If player 1 or 2 won the game
+                    self.win(num - 3) # Prints and logs the winner
+                    break # Breaks out of loop to prevent multiple win statements and excess logging
+                elif num == None: # Catch code
+                    self.game = False # Ends game
+                    break # Breaks from loop
+                self.update() # Updates GUI
+                window.updateCard() # Updates card GUI
+                self.cnt += 1 # Adds to current round cnt
+
+    def untilWar(self): # Steps until a war
+        while deck.checkHand() != 0: # While there is no war
+            self.next(1) # Steps once
+
+    def xCmd(self): # Runs step code entered number of times
+        num = window.rXEnt.get() # Gets number entered
+        if num == int : # Checks to see if a whole number
+            self.next(num) # Steps num times
+        elif str(num).lower() == 'until war': # If entered == until war
+            self.untilWar() # Repeats until there is a war
+
+    def win(self, num): # Prints and logs win
+        print('congrats player ', str(num)) # Prints win statement
+        data = Data() # Opens past data
+        data.addData(num) # Adds this rounds data
+        data.close() # Closes past data
+
+    def update(self): # Updates GUI
+        window.updateAve() # Updates averages GUI section
+        if window.endBut["state"] == "active" : # If end button is pushed
+            exit() # Ends program
+        try: # Tries to output current round info
+            window.rndDis['text'] = "Current Round: " + str(game.cnt) # The current round number
+            window.p1Dis['text'] = "Card: " + deck.p1[0][1] + "\nCards Left: " + str(len(deck.p1)) + '\nRound Wins: ' + str(self.pl1) # Player 1 info
+            window.lftDis['text'] = 'Rounds Left: ' + str(game.round) # Rounds left to run
+            window.p2Dis["text"] = "Card: " + deck.p2[0][1] + "\nCards Left: " + str(len(deck.p2)) + '\nRound Wins: ' + str(self.pl2) # Player 2 info
         except:
             pass
 
-class Game:
+    def reset(self): # Resets variable
+        self.cnt = 0 # Sets current round count to 0
+        deck.p1 = [] # Clears player 1's hand
+        deck.p2 = [] # Clears player 2's hand
+        self.pl1 = 0 # Sets player 1 wins to 0
+        self.pl2 = 0 # Sets player 2 wins to 0
+        self.game = True # Lets the game continue
+        window.windo.tk_setPalette(Helpers.randomColor()) # Randomizes the background color
 
-    def __init__(self):
-        self.round = 0
-        self.game = True
-        self.war = None
-        self.cnt = 0
-        self.pl1 = 0
-        self.pl2 = 0
-
-    def setRnd(self, num):
-        self.round = num
-        self.run()
-
-    def reset(self):
-        self.cnt = 0
-        deck.p1 = []
-        deck.p2 = []
-        self.pl1 = 0
-        self.pl2 = 0
-        self.game = True
-        window.windo.tk_setPalette(Helpers.randomColor())
-
-    def run(self):
-        while self.round > 0:
-            self.reset()
-            deck.deal()
-            while self.game:
-                num = deck.checkHand()
-                if num == 0:
-                    deck.war(0)
-                elif num == 1 or num == 2:
-                    deck.changeCard(num)
-                    self.addWin(num)
-                elif num == 3 or num == 4:
-                    self.game = False
-                    deck.win(num - 3)
-                elif num == None:
-                    self.game = False
-                deck.update()
-                self.cnt += 1
-                print(self.cnt)
-                if self.cnt % 10 == 0:
-                    window.updateCard()
-            self.round = self.round - 1
-            print("finished this round")
-            deck.update()
-
-    def addWin(self, num):
-        if num == 1:
-            self.pl1 += 1
-        elif num == 2:
-            self.pl2 += 1
-
-    def next(self, num = 5):
-        for i in range(int(num)):
-            if self.game:
-                print(game.cnt)
-                num = deck.checkHand()
-                if num == 0:
-                    deck.war(0)
-                elif num == 1 or num == 2:
-                    deck.changeCard(num)
-                    self.addWin(num)
-                elif num == 3 or num == 4:
-                    self.game = False
-                    deck.win(num - 3)
-                    break
-                elif num == None:
-                    self.game = False
-                    break
-                deck.update()
-                window.updateCard()
-                game.cnt += 1
-
-    def finish(self):
-        while game.game:
-            self.next(1)
+    def finish(self): # Runs until the hand is over
+        while game.game: # Runs if game is true
+            self.next(1) # Steps once
 
 class Window:
 
@@ -492,14 +409,14 @@ class Window:
         self.cards.update()
         self.updateCard()
 
-    def updateAve(self):
+    def updateAve(self): # Updates the averages GUI section
         num = Helpers.ave()
         self.p1WDis["text"] = num[0]
         self.aveDis["text"] = num[1]
         self.p2WDis["text"] = num[2]
         self.update()
 
-    def updateCard(self):
+    def updateCard(self): # Updates card visual more comments
         try:
             self.img1loc = 'images/green_back.png'
             self.img2loc = 'images/blue_back.png'
@@ -513,9 +430,6 @@ class Window:
             self.geo = self.geo[0].split('x')
             self.x = int(int(self.geo[0]) / 2)
             self.y = int(self.geo[1])
-            print(self.x)
-            print(self.y)
-            print()
             img = Image.open(self.img1loc)
             img = img.resize((self.x,self.y))
             img.save('images/img1tmp.png')
@@ -571,7 +485,7 @@ def manual():
     window.rXEnt.grid(column = 1)
     window.runBut['command'] = lambda : game.next(1)
     window.rn5But['command'] = lambda : game.next(5)
-    window.r10But['command'] = game.next
+    window.r10But['command'] = lambda : game.xCmd
     window.rXBut['command'] = game.finish
     deck.deal()
     window.update()
