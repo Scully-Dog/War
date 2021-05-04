@@ -405,8 +405,8 @@ class Window: # The GUIs
         img = PhotoImage(master = self.cards, file = loc) # Makes the image viewable for tkniter
         self.cards.pl1 = tk.Label(master = self.cards, image = img) # Sets left image to given image
         self.cards.pl2 = tk.Label(master = self.cards, image = img) # Sets right image to given image
-        self.cards.pl1.grid(column = 0, row = 1) # Positions the left image
-        self.cards.pl2.grid(column = 1, row = 1) # Positions the right image
+        self.cards.pl1.grid(column = 0, row = 1, sticky = 'sw') # Positions the left image
+        self.cards.pl2.grid(column = 1, row = 1, sticky = 'sw') # Positions the right image
         self.cards.update() # Updates the card display
         self.updateCard() # Updates card display to show current cards
 
@@ -492,6 +492,8 @@ def manual(): # Manual Mode, step by step
     deck.deal() # Deals the cards
     window.update() # Updates the windows
     window.windo.mainloop() # Runs forever while still excepting and following the button commands
+
+# Code starts here
 
 global mode # So i can destroy it later
 mode = tk.Tk() # Makes the mode selection window
